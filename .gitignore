@@ -30,4 +30,4 @@ Thumbs.db
 
 # Ignore Go build files
 bin/
-
+tmp/
