@@ -1,0 +1,33 @@
+# Ignore environment files with secrets
+.env
+.env.local
+.env.*.local
+
+# Ignore Docker volumes or data directories (adjust if you named them differently)
+data/
+dbdata/
+postgres-data/
+pgdata/
+
+# Ignore logs
+*.log
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore compiled binaries or executables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Ignore IDE/editor specific files
+.vscode/
+.idea/
+*.iml
+
+# Ignore Go build files
+bin/
+
