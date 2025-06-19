@@ -1,14 +1,4 @@
 services:
-  backend:
-    build: .
-    ports:
-      - "8080:8080"
-    volumes:
-      - .:/app:cached
-    environment:
-      - GO_ENV=${GO_ENV}
-      - DATABASE_URL=${DATABASE_URL}
-
   db:
     image: postgres:17.5
     restart: always
@@ -20,7 +10,31 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./db-init:/docker-entrypoint-initdb.d
+
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      - db
+    volumes:
+      - ./migrations:/migrations
+    command: [
+      "-path", "/migrations",
+      "-database", "${DATABASE_URL}",
+      "up"
+    ]
+
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app:cached
+    environment:
+      - GO_ENV=${GO_ENV}
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      - db
+      - migrate
 
 volumes:
   pgdata:
