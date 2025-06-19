@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"webserver/database"
+	"github.com/madsfranzen/go-webserver/database"
 )
 
 type User struct {

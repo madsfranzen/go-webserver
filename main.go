@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"webserver/database"
+	"github.com/madsfranzen/go-webserver/database"
 )
 
 func main() {

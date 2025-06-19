@@ -1,4 +1,4 @@
-module webserver
+module github.com/madsfranzen/go-webserver
 
 go 1.24.3
 

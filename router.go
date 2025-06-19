@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"webserver/handlers"
+	"github.com/madsfranzen/go-webserver/handlers"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
