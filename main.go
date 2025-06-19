@@ -22,6 +22,8 @@ func main() {
 	defer database.Close()
 
 	// Routes
+
+
 	r := setupRouter()
 
 	slog.Info("Server running on :8080")
