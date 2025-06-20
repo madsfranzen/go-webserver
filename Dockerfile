@@ -27,6 +27,7 @@ WORKDIR /app
 COPY --from=builder /app/server .
 
 # Set permissions
+RUN chmod +x /app/server
 RUN chown appuser:appuser /app/server
 
 # Switch to non-root user
