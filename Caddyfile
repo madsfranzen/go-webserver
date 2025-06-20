@@ -1,9 +1,3 @@
-{
-    log {
-        level WARN
-    }
-}
-
 mapids.xyz {
     reverse_proxy backend:8080
 }
