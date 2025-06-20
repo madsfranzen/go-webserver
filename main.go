@@ -19,6 +19,7 @@ func main() {
 		slog.Error("DB connection failed", "error", err)
 		os.Exit(1)
 	}
+
 	defer database.Close()
 
 	// Routes
