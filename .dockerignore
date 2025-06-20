@@ -1,0 +1,25 @@
+# Git metadata
+.git
+.gitignore
+
+# Temporary files and folders
+bin
+.tmp
+*.log
+*.tmp
+node_modules
+
+# Environment variables and secrets
+.env
+
+# Docker files themselves
+Dockerfile
+compose.yaml
+
+# IDE/editor configs
+.vscode/
+.idea/
+*.swp
+*~
+
+README.md

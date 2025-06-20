@@ -9,18 +9,12 @@ import (
 	"time"
 
 	"github.com/madsfranzen/go-webserver/database"
+	"github.com/madsfranzen/go-webserver/models"
 )
-
-type User struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Premium  bool 	`json:"premium"`
-}
 
 // CreateUser inserts a new user into the DB
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	var newUser User
+	var newUser models.User
 	if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
@@ -56,9 +50,9 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	var users []User
+	var users []models.User
 	for rows.Next() {
-		var u User
+		var u models.User
 		if err := rows.Scan(&u.ID, &u.Username, &u.Email, &u.Premium); err != nil {
 			slog.Error("Scan error: ", "error", err)
 			http.Error(w, "Failed to read users", http.StatusInternalServerError)
