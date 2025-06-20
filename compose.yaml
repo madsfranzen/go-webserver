@@ -16,9 +16,9 @@ services:
     depends_on:
       - db
     volumes:
-      - ./migrations:/migrations
+      - ./database/migrations:/database/migrations
     command: [
-      "-path", "/migrations",
+      "-path", "/database/migrations",
       "-database", "${DATABASE_URL}",
       "up"
     ]

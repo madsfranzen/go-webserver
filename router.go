@@ -16,7 +16,6 @@ func setupRouter() http.Handler {
 
 	r.Route("/users", func(r chi.Router) {
 		r.Get("/", handlers.GetUsers)
-		r.Get("/{id}", handlers.GetUserByID) // your GetUserByID func
 		r.Post("/", handlers.CreateUser)
 	})
 	return r

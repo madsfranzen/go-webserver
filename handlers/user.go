@@ -4,10 +4,10 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"net/http"
+	"time"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/google/uuid"
 	"github.com/madsfranzen/go-webserver/database"
 )
 
@@ -15,29 +15,7 @@ type User struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
-}
-
-// GetUserByID fetches a single user by ID from the DB
-func GetUserByID(w http.ResponseWriter, r *http.Request) {
-	userID := chi.URLParam(r, "id")
-
-	// Validate UUID format
-	if _, err := uuid.Parse(userID); err != nil {
-		http.Error(w, "Invalid user ID", http.StatusBadRequest)
-		return
-	}
-
-	var user User
-	err := database.Pool.QueryRow(context.Background(),
-		"SELECT id, username, email FROM users WHERE id = $1", userID).
-		Scan(&user.ID, &user.Username, &user.Email)
-	if err != nil {
-		http.Error(w, "User not found", http.StatusNotFound)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	Premium  bool 	`json:"premium"`
 }
 
 // CreateUser inserts a new user into the DB
@@ -50,8 +28,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// Optional: Validate newUser.Username and newUser.Email here
 	err := database.Pool.QueryRow(context.Background(),
-		"INSERT INTO users (username, email) VALUES ($1, $2) RETURNING id",
-		newUser.Username, newUser.Email).Scan(&newUser.ID)
+		"INSERT INTO users (username, email, premium) VALUES ($1, $2, $3) RETURNING id",
+		newUser.Username, newUser.Email, newUser.Premium).Scan(&newUser.ID)
 	if err != nil {
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
@@ -63,18 +41,26 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-	var users []User
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
 
-	rows, err := database.Pool.Query(context.Background(), "SELECT id, username, email FROM users")
+	rows, err := database.Pool.Query(ctx, `SELECT id, username, email, premium FROM users`)
 	if err != nil {
+		if ctx.Err() != nil {
+			slog.Error("DB query canceled or timed out: ", "error", ctx.Err())
+		} else {
+			slog.Error("Query failed: ", "error", err)
+		}
 		http.Error(w, "Failed to query users", http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
+	var users []User
 	for rows.Next() {
 		var u User
-		if err := rows.Scan(&u.ID, &u.Username, &u.Email); err != nil {
+		if err := rows.Scan(&u.ID, &u.Username, &u.Email, &u.Premium); err != nil {
+			slog.Error("Scan error: ", "error", err)
 			http.Error(w, "Failed to read users", http.StatusInternalServerError)
 			return
 		}
@@ -82,5 +68,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	if err := json.NewEncoder(w).Encode(users); err != nil {
+		slog.Error("Failed to encode response: ", "error", err)
+	}
 }
